@@ -21,7 +21,7 @@ all="Pathfix ArtFix FbrFix SiegeFix WallFix ZombieFix CollapseFix GroupFix Guard
 } > "$work/stubs.cpp"
 $CXX $FLAGS -c "$work/stubs.cpp" -o "$work/stubs.o"
 $CXX $FLAGS -c "src/shaku/$obj.cpp" -o "$work/$obj.o"
-for f in dllmain log config hooks patch_window patch_agent_chance patch_uiscale patch_campaign patch_battle patch_altmove patch_altinput patch_uidiag; do
+for f in dllmain log config hooks patch_window patch_agent_chance patch_uiscale patch_campaign patch_battle patch_altmove patch_altinput patch_uidiag patch_movecell; do
   [ -f "build/$f.o" ] || $CXX $FLAGS -c "src/$f.cpp" -o "build/$f.o" 2>/dev/null
 done
 for f in hook gamemem; do
@@ -29,7 +29,7 @@ for f in hook gamemem; do
 done
 $CXX -shared -static -static-libgcc -static-libstdc++ -Wl,--kill-at -Wl,--enable-stdcall-fixup -o "$work/dinput8.dll" \
   build/dllmain.o build/log.o build/config.o build/hooks.o build/patch_window.o build/patch_agent_chance.o \
-  build/patch_uiscale.o build/patch_campaign.o build/patch_battle.o build/patch_altmove.o build/patch_altinput.o build/patch_uidiag.o build/shaku_hook.o build/shaku_gamemem.o \
+  build/patch_uiscale.o build/patch_campaign.o build/patch_battle.o build/patch_altmove.o build/patch_altinput.o build/patch_uidiag.o build/patch_movecell.o build/shaku_hook.o build/shaku_gamemem.o \
   "$work/$obj.o" "$work/stubs.o" src/dinput8.def -luser32 -lkernel32
 cp test/real_engine_check.exe test/tws2fix.ini "$work/"
 ln -s "$(readlink -f test/empire.retail.dll)" "$work/empire.retail.dll"

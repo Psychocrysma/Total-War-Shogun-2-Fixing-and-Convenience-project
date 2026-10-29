@@ -1,4 +1,4 @@
-# Test checklist for build 0.8.0
+# Test checklist for build 0.8.4
 
 Each test takes a minute. Send back `tws2fix.log` after the last one; it is the main thing I need.
 
@@ -66,6 +66,17 @@ Each test takes a minute. Send back `tws2fix.log` after the last one; it is the 
   again, which is the A/B check.
 - On the Expanded Japan / Hokkaido map: settlement and building models beyond the old ±350 line should now
   be drawn. If they still are not, the models are missing for another reason (the data side).
+
+## 7b. Movement-range area on rescaled maps (automatic)
+
+- Default `movement_cell_size=auto`. At start-up the log says `movement_cell_size: auto ON ... (budget
+  scaling on)`.
+- Vanilla campaign: the log lists the map's grid with `2.0000-unit cells (overlay already matches)`;
+  the yellow area is unchanged.
+- Expanded Japan k200 pack: the log says `map grid N has 4.0000-unit cells ...`. Select an army with full
+  movement: the yellow area ends where a right-click-held path turns red (confirmed for armies; fleets
+  and agents come out slightly short, known).
+- `movement_debug_log=1` logs each budget scaling (`movement-range budget 50 -> 25 (cell 4.0000)`).
 
 ## 8. Battle fixes (0.5.0)
 

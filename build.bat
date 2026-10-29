@@ -13,7 +13,7 @@ for %%f in (src\*.cpp) do (
 for %%f in (src\shaku\*.cpp) do (
     %CXX% %FLAGS% -c %%f -o build\shaku_%%~nf.o || exit /b 1
 )
-%CXX% -shared -static -static-libgcc -static-libstdc++ -Wl,--kill-at -Wl,--enable-stdcall-fixup -o dist\dinput8.dll build\dllmain.o build\log.o build\config.o build\hooks.o build\patch_window.o build\patch_agent_chance.o build\patch_uiscale.o build\patch_campaign.o build\patch_battle.o build\patch_altmove.o build\patch_altinput.o build\patch_uidiag.o build\shaku_*.o src\dinput8.def -luser32 -lkernel32 || exit /b 1
+%CXX% -shared -static -static-libgcc -static-libstdc++ -Wl,--kill-at -Wl,--enable-stdcall-fixup -o dist\dinput8.dll build\dllmain.o build\log.o build\config.o build\hooks.o build\patch_window.o build\patch_agent_chance.o build\patch_uiscale.o build\patch_campaign.o build\patch_battle.o build\patch_altmove.o build\patch_altinput.o build\patch_uidiag.o build\patch_movecell.o build\shaku_*.o src\dinput8.def -luser32 -lkernel32 || exit /b 1
 i686-w64-mingw32-strip dist\dinput8.dll
 copy /y src\tws2fix.ini dist\tws2fix.ini >nul
 echo built dist\dinput8.dll

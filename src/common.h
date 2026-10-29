@@ -12,7 +12,7 @@
 #define DLog(...) do { if (g_cfg.alt_debug_log) Log(__VA_ARGS__); } while (0)
 #include <string>
 
-#define TWS2FIX_VERSION "0.8.0"
+#define TWS2FIX_VERSION "0.8.4"
 
 // ---- logging ----------------------------------------------------------------
 void LogOpen(const std::wstring& path);
@@ -35,6 +35,9 @@ struct Config {
     bool ui_scale_log_box = false;         // diagnostics: log who shows the battle drag-selection box
     uint32_t ui_scale_extra_callers[16] = {}; // diagnostics: extra caller RVAs that should see the scaled rect
     int ui_scale_extra_count = 0;
+    float movement_cell_size = 0.0f; // forced movement-range cell size (used when movement_cell_auto is off; 0 = off)
+    bool  movement_cell_auto = true;
+    bool  movement_debug_log = false; // diagnostics: campaign movement-range code activity // movement-range cell size taken from each map's pathfinding grid
     float settlement_box = 1000.0f;  // half-size of the settlement render box in map units (vanilla 350; 0 = leave it)
     int   vram_mb = 0;               // >0: tell the engine it has this much video memory (max 4095)
     // [battle] section: ShakuEight's battle fixes (src/shaku/). Single player only.
@@ -83,6 +86,7 @@ void PatchWindow_Install();      // borderless + cursor clip (IAT hooks + watche
 void PatchAgentChance_Install(); // signed clamp for agent action success chance (engine bytes)
 void PatchUIScale_Install();     // UI scaling via the engine's UI rect (engine bytes + detour)
 void PatchUIScale_OnResolution(int w, int h);
+void PatchMoveCell_Install();    // movement-range overlay cell size (engine bytes)
 void PatchCampaign_Install();    // settlement render box, video memory override (engine bytes)
 void PatchBattle_Install();      // ShakuEight's battle fixes (src/shaku/fix_*.cpp), per [battle] keys
 void PatchBattle_Remove();

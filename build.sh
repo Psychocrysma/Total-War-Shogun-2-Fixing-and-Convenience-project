@@ -18,10 +18,11 @@ $CXX $FLAGS -c src/patch_battle.cpp -o build/patch_battle.o
 $CXX $FLAGS -c src/patch_altmove.cpp -o build/patch_altmove.o
 $CXX $FLAGS -c src/patch_altinput.cpp -o build/patch_altinput.o
 $CXX $FLAGS -c src/patch_uidiag.cpp -o build/patch_uidiag.o
+$CXX $FLAGS -c src/patch_movecell.cpp -o build/patch_movecell.o
 for f in src/shaku/*.cpp; do
     $CXX $FLAGS -c "$f" -o "build/shaku_$(basename "${f%.cpp}").o"
 done
-CORE="build/dllmain.o build/log.o build/config.o build/hooks.o build/patch_window.o build/patch_agent_chance.o build/patch_uiscale.o build/patch_campaign.o build/patch_battle.o build/patch_altmove.o build/patch_altinput.o build/patch_uidiag.o"
+CORE="build/dllmain.o build/log.o build/config.o build/hooks.o build/patch_window.o build/patch_agent_chance.o build/patch_uiscale.o build/patch_campaign.o build/patch_battle.o build/patch_altmove.o build/patch_altinput.o build/patch_uidiag.o build/patch_movecell.o"
 $CXX $LDFLAGS -o dist/dinput8.dll $CORE build/shaku_*.o src/dinput8.def -luser32 -lkernel32
 i686-w64-mingw32-strip dist/dinput8.dll
 cp src/tws2fix.ini dist/tws2fix.ini

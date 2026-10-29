@@ -56,6 +56,7 @@ void InstallAll(const char* how) {
     PatchAgentChance_Install();
     PatchUIScale_Install();
     PatchCampaign_Install();
+    PatchMoveCell_Install();
     PatchBattle_Install();
     PatchAltMove_Install();
     PatchAltInput_Install();
