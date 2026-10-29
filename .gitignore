@@ -1,0 +1,14 @@
+# build output
+build/
+dist/
+*.o
+*.exe
+*.dll
+# game files and local test artefacts (never publish CA's files)
+test/empire.retail.dll
+test/shogun2.exe
+test/*.log
+*.log
+# python caches
+__pycache__/
+*.pyc

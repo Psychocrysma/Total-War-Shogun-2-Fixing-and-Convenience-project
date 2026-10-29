@@ -1,0 +1,11 @@
+TWS2-Fixing-Project
+Copyright (c) 2026 the TWS2-Fixing-Project contributors. MIT License (LICENSE).
+
+This project includes code from Shogun2-fix by ShakuEight
+(https://github.com/ShakuEight/Shogun2-fix), Copyright 2026 ShakuEight, licensed under the
+Apache License, Version 2.0 (third_party/LICENSE-APACHE-2.0): the battle fixes and the hook engine in
+src/shaku/. Each file carries its attribution and a note of what was changed for this project.
+
+Unofficial fan project, not affiliated with or endorsed by Creative Assembly or SEGA. Total War and
+SHOGUN are trademarks of their owners. The repository contains no game code or game data beyond the
+short byte signatures and offsets the fixes use to locate and verify their patch sites.
