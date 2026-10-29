@@ -149,6 +149,15 @@ for the same engine build (multithreaded draw submission, flip-model swap chain,
 `d3d11.dll` proxy, so the two can be installed together. Both implement borderless window and cursor clipping:
 enable that in one of them only.
 
+## Credits
+
+- **Claude** (Anthropic's AI model) did nearly all of the work: reverse-engineering the engine, writing the
+  code, the tools and the documentation, and porting ShakuEight's battle fixes.
+- **Psychocrysma** started and directed the project, chose what to fix, designed the Alt group-move, and
+  tested every build in game (logs, screenshots and videos that drove each fix).
+- **ShakuEight**: the ten battle fixes in `src/shaku/` come from
+  [ShakuEight/Shogun2-fix](https://github.com/ShakuEight/Shogun2-fix) (Apache 2.0, see `NOTICE`).
+
 ## Licence
 
 MIT. See `LICENSE`.
