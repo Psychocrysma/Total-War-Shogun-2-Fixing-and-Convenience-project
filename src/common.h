@@ -12,7 +12,7 @@
 #define DLog(...) do { if (g_cfg.alt_debug_log) Log(__VA_ARGS__); } while (0)
 #include <string>
 
-#define TWS2FIX_VERSION "0.8.9"
+#define TWS2FIX_VERSION "0.9.0"
 
 // ---- logging ----------------------------------------------------------------
 void LogOpen(const std::wstring& path);
@@ -23,10 +23,12 @@ void LogClose();
 struct Config {
     bool log = true;
     bool cursor_clip = true;         // keep the mouse inside the game window while it is active
-    bool borderless = false;         // windowed mode -> borderless window covering the monitor
+    bool borderless = true;          // windowed mode -> borderless window covering the monitor (off if s2fix's is on)
     bool s2fix_compat = true;        // give way to s2fix's borderless/cursor clip and leave its import slots alone
     bool allow_unknown_build = false;// apply address-based patches even if the engine build differs
     bool agent_chance_clamp = true;  // fix the unsigned 5..95 clamp in agent action chances (the 95% bug)
+    std::wstring minimap_area;       // campaign minimap area: auto / on / off / x0,y0,x1,y1
+    bool minimap_debug_log = false;
     std::wstring fots_voice_units;   // unit keys that use the FotS British voice set like the Tercos ([voices])
     bool fots_voice_debug_log = false;
     bool clan_select_exact = true;   // clan selection picks the exact key before a longer key containing it
@@ -95,6 +97,7 @@ void PatchAgentChance_Install(); // signed clamp for agent action success chance
 void PatchUIScale_Install();     // UI scaling via the engine's UI rect (engine bytes + detour)
 void PatchUIScale_OnResolution(int w, int h);
 void PatchMoveCell_Install();    // movement-range overlay cell size (engine bytes)
+void PatchMinimap_Install();      // campaign minimap follows the theatre box (src/patch_minimap.cpp)
 void PatchUnitVoices_Install();  // European voice set for listed unit keys (engine hooks)
 void PatchUnitVoices_Remove();
 void PatchClanSelect_Install();  // clan selection: exact key match first (engine detour)

@@ -22,10 +22,11 @@ $CXX $FLAGS -c src/patch_movecell.cpp -o build/patch_movecell.o
 $CXX $FLAGS -c src/patch_battlerules.cpp -o build/patch_battlerules.o
 $CXX $FLAGS -c src/patch_clanselect.cpp -o build/patch_clanselect.o
 $CXX $FLAGS -c src/patch_unitvoices.cpp -o build/patch_unitvoices.o
+$CXX $FLAGS -c src/patch_minimap.cpp -o build/patch_minimap.o
 for f in src/shaku/*.cpp; do
     $CXX $FLAGS -c "$f" -o "build/shaku_$(basename "${f%.cpp}").o"
 done
-CORE="build/dllmain.o build/log.o build/config.o build/hooks.o build/patch_window.o build/patch_agent_chance.o build/patch_uiscale.o build/patch_campaign.o build/patch_battle.o build/patch_altmove.o build/patch_altinput.o build/patch_uidiag.o build/patch_movecell.o build/patch_battlerules.o build/patch_clanselect.o build/patch_unitvoices.o"
+CORE="build/dllmain.o build/log.o build/config.o build/hooks.o build/patch_window.o build/patch_agent_chance.o build/patch_uiscale.o build/patch_campaign.o build/patch_battle.o build/patch_altmove.o build/patch_altinput.o build/patch_uidiag.o build/patch_movecell.o build/patch_battlerules.o build/patch_clanselect.o build/patch_unitvoices.o build/patch_minimap.o"
 $CXX $LDFLAGS -o dist/dinput8.dll $CORE build/shaku_*.o src/dinput8.def -luser32 -lkernel32
 i686-w64-mingw32-strip dist/dinput8.dll
 cp src/tws2fix.ini dist/tws2fix.ini

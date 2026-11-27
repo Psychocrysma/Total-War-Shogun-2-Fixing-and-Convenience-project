@@ -14,6 +14,13 @@ void ConfigLoad(const std::wstring& ini) {
     g_cfg.borderless          = ReadBool(L"patches", L"borderless", g_cfg.borderless, ini);
     g_cfg.s2fix_compat        = ReadBool(L"patches", L"s2fix_compat", g_cfg.s2fix_compat, ini);
     g_cfg.agent_chance_clamp  = ReadBool(L"patches", L"agent_chance_clamp", g_cfg.agent_chance_clamp, ini);
+    {   static wchar_t mbuf[128];
+        GetPrivateProfileStringW(L"patches", L"minimap_area", L"auto", mbuf, 128, ini.c_str());
+        std::wstring v = mbuf; while (!v.empty() && (v.back() == L' ' || v.back() == L'\t')) v.pop_back();
+        for (auto& c : v) if (c >= L'A' && c <= L'Z') c += 32;
+        g_cfg.minimap_area = v;
+        g_cfg.minimap_debug_log = ReadBool(L"patches", L"minimap_debug_log", false, ini);
+    }
     {   // [voices] fots_voice_units: missing key = the Portugal add-on's list; empty value = off
         static wchar_t vbuf[8192];
         GetPrivateProfileStringW(L"voices", L"fots_voice_units", L"Port_Aventuros,Port_Besteiros,Port_Besteiros_Garrison,Port_Besteiros_Garrison_Retainers,Port_Besteiros_do_Conto,Port_Besteiros_do_Conto_Garrison,Port_Espingardeiros,Port_Espingardeiros_Garrison,Port_Halbediers,Port_Halbediers_Garrison,Port_Halbediers_Garrison_Guard,Port_Merchant_Crew,Port_Merchant_Crew_Garrison,Port_Musketeers,Port_Musketeers_Garrison,Port_Musketeers_Garrison_Retainers,Port_Pikemen,Port_Pikemen_Garrison,Port_Rodeleros,Port_Rodeleros_Garrison,Port_Rodeleros_Garrison_Champions,Port_Rodeleros_Garrison_Guard,Port_Swordsmen,Port_Swordsmen_Garrison,Port_Swordsmen_Garrison_Retainers,Port_Caravel,Port_Galleon,Port_Merchant_Caravel", vbuf, 8192, ini.c_str());

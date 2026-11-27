@@ -1,10 +1,10 @@
-# Test checklist for build 0.8.9
+# Test checklist for build 0.9.0
 
 Each test takes a minute. Send back `tws2fix.log` after the last one; it is the main thing I need.
 
 ## 1. Loader (nothing should change)
 
-- Copy `dinput8.dll` and `tws2fix.ini` into the game folder. Leave `tws2fix.ini` as shipped (`borderless=0`).
+- Copy `dinput8.dll` and `tws2fix.ini` into the game folder. Leave `tws2fix.ini` as shipped (`borderless=1`).
 - Start the game, reach the main menu, start or load a campaign, play one turn, quit.
 - Expected: the game behaves exactly as before. `tws2fix.log` in the game folder contains
   `engine: empire.retail.dll ... (known May 2023 build)`, `installing patches (launcher GetProcAddress)`,
@@ -20,13 +20,15 @@ Each test takes a minute. Send back `tws2fix.log` after the last one; it is the 
 - Open an in-game dialog (quit confirmation): the cursor should be free while the dialog has focus. If it
   is not, note it; the clip only follows the main window being in the foreground.
 
-## 3. Borderless (optional)
+## 3. Borderless (on by default)
 
 - In the game's graphics options set Windowed and your desktop resolution; restart the game.
-- Set `borderless=1` in `tws2fix.ini` and start the game.
+- With `borderless=1` (as shipped) and no s2fix, start the game. The log says `-> borderless`.
 - Expected: no title bar or frame, the window fills the monitor, alt-tab is instant.
 - Note anything odd: wrong size, a visible frame, mouse offset, flicker on alt-tab.
-- Set `borderless=0` again afterwards if you prefer exclusive fullscreen.
+- In exclusive fullscreen the setting does nothing; that is expected.
+- With s2fix installed and its borderless on, the log says `our borderless is off; s2fix's borderless mode is used`.
+  With s2fix's `borderless=0` in `s2prof.ini`, ours stays on.
 
 ## 4. Agent chance (the Metsuke 95% bug)
 
@@ -115,7 +117,7 @@ Each test takes a minute. Send back `tws2fix.log` after the last one; it is the 
 - If something is off: set `alt_debug_log=1` under `[battle]`, repeat once, and send `tws2fix.log`
   (it then records per-hold traces: `alttrace:`, `altmeasure:`, `altmove:` lines).
 
-## 10. Battle rule fixes (new in 0.8.9)
+## 10. Battle rule fixes (new in 0.8.5)
 
 Set `battle_rules_debug_log=1` in `[battle]` for these tests.
 
@@ -147,7 +149,7 @@ Set `battle_rules_debug_log=1` in `[battle]` for these tests.
   and wait a minute before engaging. Then send the log: the `battle_ai: state ...` lines show which plan
   the defending ships were given.
 
-## 11. European voices for Portugal's units (new in 0.8.9)
+## 11. European voices for Portugal's units (new in 0.8.8)
 
 Needs Expanded Japan with the Portugal add-on, **DLL edition** (v20.9). Set `fots_voice_debug_log=1` in `[voices]`.
 
@@ -176,6 +178,19 @@ Install s2fix's original-game package beside this DLL and play in DirectX 11 mod
 - Also try a game resolution below the monitor's (s2fix stretches the picture and rescales the mouse):
   the drag box and Alt group-move should still follow the cursor.
 - Alt-tab out and back: the cursor should be released and clipped again.
+
+## 13. Campaign minimap on enlarged maps (new in 0.9.0)
+
+Needs the Hokkaido add-on build with the redrawn minimap. Set `minimap_debug_log=1` in `[patches]`.
+- Load a campaign. The log should show `minimap_area: theatre box -305.0,-240.0 .. 432.0,196.0 (fixed area ... replaced)`
+  and a list of theatres with `<- the record the minimap reads` next to the main one. If the box shown is
+  not the map's theatre box, send the log: the fix then needs `minimap_area=x0,y0,x1,y1`.
+- Click the minimap on Kyushu, Kanto, Mutsu, Ezo (Matsumae) and eastern Hokkaido (Menashi): the camera
+  should go to the place clicked.
+- Move the camera by dragging and by keyboard: the camera marker should follow, including over Hokkaido.
+- Army and fleet icons and the region highlight on hover should sit on the right land.
+- Plain Expanded Japan without Hokkaido: the log says `equals CA's, left as is` and the minimap is as before.
+- `minimap_area=off`: the Hokkaido minimap is squeezed and misaligned again.
 
 ## What to send back
 

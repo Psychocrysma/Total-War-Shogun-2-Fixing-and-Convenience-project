@@ -59,6 +59,7 @@ void InstallAll(const char* how) {
     PatchMoveCell_Install();
     PatchClanSelect_Install();
     PatchUnitVoices_Install();
+    PatchMinimap_Install();
     PatchBattle_Install();
     PatchBattleRules_Install();
     PatchAltMove_Install();
