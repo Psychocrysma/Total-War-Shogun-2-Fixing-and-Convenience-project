@@ -12,7 +12,7 @@
 #define DLog(...) do { if (g_cfg.alt_debug_log) Log(__VA_ARGS__); } while (0)
 #include <string>
 
-#define TWS2FIX_VERSION "0.8.4"
+#define TWS2FIX_VERSION "0.8.9"
 
 // ---- logging ----------------------------------------------------------------
 void LogOpen(const std::wstring& path);
@@ -24,8 +24,12 @@ struct Config {
     bool log = true;
     bool cursor_clip = true;         // keep the mouse inside the game window while it is active
     bool borderless = false;         // windowed mode -> borderless window covering the monitor
+    bool s2fix_compat = true;        // give way to s2fix's borderless/cursor clip and leave its import slots alone
     bool allow_unknown_build = false;// apply address-based patches even if the engine build differs
     bool agent_chance_clamp = true;  // fix the unsigned 5..95 clamp in agent action chances (the 95% bug)
+    std::wstring fots_voice_units;   // unit keys that use the FotS British voice set like the Tercos ([voices])
+    bool fots_voice_debug_log = false;
+    bool clan_select_exact = true;   // clan selection picks the exact key before a longer key containing it
     float ui_scale = 0.0f;           // >1.0 enlarges the UI by that factor (0 = off); ignored when ui_scale_auto
     bool  ui_scale_auto = true;      // "auto": UI the size it has at 1920x1080, whatever the resolution (off at <=1080p)
     bool ui_scale_rt = true;         // mode 1 only: also detour the overlay-target size helper
@@ -54,7 +58,11 @@ struct Config {
     bool fix_kneel_fire = true;      // Kneel Fire units take move orders
     bool alt_group_move = true;      // Alt + hold LMB moves the selection as a block; Ctrl while holding rotates
     bool alt_debug_log = false;      // per-hold diagnostics of the Alt group-move (traces, measurements)
-    int  alt_rotate_speed = 64;      // rotation per pixel of mouse travel, in 1/65536 turn units
+    int  alt_rotate_speed = 64;
+    bool ai_difficulty_accuracy = true;     // vanilla AI missile accuracy bonus on Hard / Very Hard (0 = removed)
+    bool projectile_sound_priority = true;  // firing sound chosen by weapon before unit (fixes cannon sounds on guns/bows)
+    bool fear_stacking = true;              // fear from effects = their total (vanilla: flat 4 if non-zero)
+    bool battle_rules_debug_log = false;    // diagnostics for the battle rule fixes      // rotation per pixel of mouse travel, in 1/65536 turn units
 };
 extern Config g_cfg;
 void ConfigLoad(const std::wstring& iniPath);
@@ -87,6 +95,9 @@ void PatchAgentChance_Install(); // signed clamp for agent action success chance
 void PatchUIScale_Install();     // UI scaling via the engine's UI rect (engine bytes + detour)
 void PatchUIScale_OnResolution(int w, int h);
 void PatchMoveCell_Install();    // movement-range overlay cell size (engine bytes)
+void PatchUnitVoices_Install();  // European voice set for listed unit keys (engine hooks)
+void PatchUnitVoices_Remove();
+void PatchClanSelect_Install();  // clan selection: exact key match first (engine detour)
 void PatchCampaign_Install();    // settlement render box, video memory override (engine bytes)
 void PatchBattle_Install();      // ShakuEight's battle fixes (src/shaku/fix_*.cpp), per [battle] keys
 void PatchBattle_Remove();
@@ -95,6 +106,7 @@ void PatchAltMove_Remove();
 void PatchAltInput_Install();
 void PatchAltInput_OnMainWindow(HWND hwnd);
 bool PatchAltInput_SwapActive();
+void PatchBattleRules_Install(); // battle rule fixes (src/patch_battlerules.cpp)
 void PatchUIDiag_Install();
 void PatchUIDiag_Remove();
 void PatchUIScale_Remove();    // hides Alt from the engine while the left button is held (src/patch_altinput.cpp)

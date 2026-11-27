@@ -32,7 +32,7 @@ installs its own hooks when the launcher (`shogun2.exe`) asks the engine for its
 after the engine is fully loaded and before it runs any code, so the hooks are in place for the first
 window the game creates.
 
-## Patches in this build (0.8.4)
+## Patches in this build (0.8.9)
 
 | Key in `tws2fix.ini` | Default | What it does |
 | --- | --- | --- |
@@ -42,6 +42,7 @@ window the game creates.
 | `ui_scale` | auto | `auto` gives the UI the size it has at 1920×1080 on any screen (nothing happens at 1080p or below); `off` disables it; a number is a factor of your own (1.333 at 2560×1440). It revives the engine's dormant "UI rect" variables: the UI is laid out and projected on a smaller logical screen, while the viewports and the mouse mapping keep the real screen, so the UI is rasterised at native resolution, not upscaled. The upper limit is `min(width/1280, height/1024)` because the engine floors the layout at 1280×1024. Loading screens are not scaled. The battle drag-selection box, which the engine positions in screen pixels, is mapped onto the scaled layout so it starts under the cursor. Tested at 2560×1440 under Proton. |
 | `settlement_box` | 1000 | Half-size, in map units, of the box inside which the campaign display draws settlement and building models. The engine builds that quadtree with fixed bounds (−350,−10,−350)…(350,100,350); models placed outside never enter it and are never drawn, which is why large map mods lose settlements past ±350 while flags and units still show. The patch rewrites the four bounds constants before the tree is built. The campaign tree display has the same limit (its spatial tree is built for ±350 on both axes), so trees past ±350 vanish too; since 0.7.0 the same setting widens that box as well. On by default at 1000, which covers any map; the vanilla map is unaffected because everything it has is inside ±350 either way. |
 | `movement_cell_size` | auto | For map mods that rescale the campaign map (Expanded Japan's 4× pack has 4.0-unit movement-grid cells instead of 2.0). The yellow movement-range area is computed by `FUN_107e40f0` / `FUN_107e4510`, which hand the army's movement points straight to a flood that charges true map distance, while the real move and the red path come out at half that on a 4.0-unit grid. With `auto`, each map's grid cell size is read when it loads (the grid constructor `FUN_107621f0` is wrapped) and the movement points given to the area are scaled by 2.0 / cell size; the 42 cell-size constants of the area's edge refinement (`FUN_107753c0`, `FUN_10776700`, `FUN_10777600`) are set to the same cell size. CA's maps (2.0) are unchanged. A number forces one value for every map; `0` turns it off. `movement_debug_log=1` logs the scaling. |
+| `clan_select_exact` | on | The campaign selection screen finds a clicked button's clan with `FUN_1101a930`: it takes the button's name after its first `_` (`button_nasu` → `nasu`) and returns the first clan, in alphabetical key order, whose key *contains* that text. A clan whose key sits inside a longer key that sorts before it can never be started from its own button: with Expanded Japan's Hokkaido pack, Nasu's button started a Menasunkur campaign. The button name arrives as the engine's UTF-8 string and the clan keys are UTF-16. The patch wraps the function: the game's search runs as before, and if a clan's key is exactly the button's text, that clan is returned instead. Without an exact match nothing changes. Checked against the real engine under Wine with a test clan list (`test/clan_select_check.cpp`): unpatched, `button_nasu` returns Menasunkur; patched, every button returns its own clan. Entry bytes checked, verified build only. |
 | `vram_mb` | 0 (off) | Overrides the video-memory total the renderer budgets its textures from. The engine has a debug variable `force_total_video_memory` that replaces the device query when non-zero; this writes the configured figure (MB, max 4095) into it before the device is created. A 32-bit process is usually told ~2.9 GB whatever the card. |
 | `log` | on | Writes `tws2fix.log`. Keep it on while testing; it records every window the engine creates and every patch applied. |
 
@@ -67,6 +68,41 @@ replays only** — a changed simulation desyncs multiplayer. `battle_fixes=0` tu
 | `fix_single_unit_group` | G, Ctrl+G and Ctrl+number refuse a single unit; the fix lets one unit form a soft or locked group. |
 | `fix_guard_mode` | Missile units in guard mode chase a target that left their range and keep shooting at shattered units. |
 | `fix_kneel_fire` | Fall of the Samurai: units with Kneel Fire on refuse every move order. |
+
+### Using it with s2fix (new in 0.8.9)
+
+[s2fix](https://github.com/DudeCmonMan/s2fix) by DudeCmonMan is a separate performance mod for the same game (frame rate, loading times, FSR, borderless fullscreen, campaign map speed). It loads as `d3d11.dll` and works beside this DLL: install both. None of the engine code the two patch is shared.
+
+Both mods deal with the game window, so `s2fix_compat=1` (on by default, `[patches]`) makes this DLL give way when it finds `s2prof.dll` and `d3d11.dll` in the game folder:
+- s2fix's borderless mode is used and ours stays off. Until 0.8.8 this DLL hooked the window functions (SetWindowLongW, SetWindowPos, MoveWindow) that s2fix's borderless mode checks, so its borderless mode switched itself off. They are now left to s2fix, and the UI scaling follows the game's resolution through a timer on the game window instead.
+- If s2fix clips the cursor (`clip_cursor=1` in `s2prof.ini`), our cursor clip stands down while s2fix is loaded.
+- s2fix loads only in DirectX 11 mode. In DirectX 9 it does nothing, our cursor clip carries on, and our borderless stays off unless you set `s2fix_compat=0`.
+
+The log says what was decided (`s2fix_compat: ...` lines).
+
+### European voices for a mod's units (new in 0.8.9, `[voices]` section)
+
+`src/patch_unitvoices.cpp`. The game gives the Portuguese Tercos Fall of the Samurai's British voice set by naming their unit key in its code. `fots_voice_units` is a list of unit keys that get the same treatment, so a mod's European units can speak with that voice set (or with files that replace it, like a Portuguese voice mod) while keeping their own keys. The default list is the infantry and ships of Expanded Japan's Portugal add-on (DLL edition); keys that are not in the game do nothing, and an empty value switches it off.
+
+| Where | What the engine does | What the patch adds |
+| --- | --- | --- |
+| Unit record, `FUN_10c0c9c0` at `0x10C0CCE6` | Voice nationality at record+0xD4 (0 British … 3 Japanese); the Tercos are forced to 0. | A listed key is set to 0. |
+| Battle land unit, `FUN_10129db0` at `0x1012A618` | Byte unit+0xFC8 = key starts with `Boshin` or is the Tercos. | 1 for a listed key. |
+| Battle ship, `FUN_1035ae20` at `0x1035C405` | Byte ship+0x16D0 = key starts with `Boshin`. | 1 for a listed key. |
+| Battle audio set-up, `FUN_10291ae0` at `0x10291C12` / `0x10291B99` | A flagged unit of the player's alliance switches battle sound events to the `bosh_` set; the Tercos are skipped by key. | Listed keys are skipped too, so a Sengoku battle keeps its own sounds. |
+
+The mod must ship the voice files and set the units' voice columns as the Royal Marines have them (`VO_actor_numbers` 24,25; `num_audio_VO_variations` 2; `audio_language` UK). Infantry and ships only: the voice set has no cavalry, general or artillery lines. Checked against the real engine under Wine (`test/unit_voices_check.cpp` runs the engine's code at the five sites on made-up units, vanilla and patched); what is actually heard needs an in-game test. `fots_voice_debug_log=1` logs each listed unit as its record loads and as it enters a battle.
+
+### Battle rule fixes (new in 0.8.9, `[battle]` section)
+
+Written for this project (`src/patch_battlerules.cpp`), single player only like the fixes above.
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `ai_difficulty_accuracy` | 1 (vanilla) | On Hard, Very Hard and Legendary the AI's missile units shoot more accurately: the engine multiplies an AI unit's core marksmanship by 1.3 (Hard) or 1.5 (Very Hard and Legendary), ships by 1.15 / 1.3 (`FUN_1043d500`), and adds +20 / +30 projectile marksmanship (`FUN_104646c0`). Both feed the chance to hit and the kill chance. `0` removes that bonus and keeps the AI's other difficulty effects (melee +2 / +4, campaign handicaps). |
+| `projectile_sound_priority` | 1 | The firing sound comes from `sound_bank_projectile_fire.xml`, scored by gun type (weight 4), shot type (1), distance, game mode and unit (10) in `FUN_10cc71b0`. A listed but different gun or shot type only loses points, so an entry made for a unit's cannon outscores the right matchlock, bow or torch entry when that unit fires its other weapon. The fix ranks entries that accept the projectile's gun and shot type above those that exclude it; otherwise the game's own scoring decides. |
+| `fear_stacking` | 1 | Fear from traits, ancillaries, skills and effect bundles reaches a unit as the unit-record bonus `scares_men`. The battle unit builder (`FUN_10151f10`) only tests the total for zero: any non-zero total gives the flat morale-table fear of 4, and +1 from one source and −1 from another cancel to no fear. The fix makes the unit's fear the total itself (three +1 traits = 3; 0 or less = none). Fear that comes from a unit's own attributes is not touched. |
+| `battle_rules_debug_log` | 0 | Logs the difficulty values the missile code sees, every changed firing-sound choice, and which battle-AI state each army group enters (for the naval defender AI investigation). |
 
 The port keeps each fix's logic unchanged and removes ShakuEight's development scaffolding (toggle keys, tones,
 research probes, test exports). Two things changed for the compiler: the detour stubs are emitted as GCC assembly
@@ -127,6 +163,7 @@ Linux cross-build: `apt install gcc-mingw-w64-i686 g++-mingw-w64-i686` then `./b
 - `src/patch_window.cpp` — borderless window and cursor clipping
 - `src/patch_agent_chance.cpp` — the agent-action chance clamp fix (engine byte patch, with addresses)
 - `src/patch_uiscale.cpp` — UI scaling through the engine's UI rect variables and a caller-aware detour of the rect getter
+- `src/patch_clanselect.cpp` — clan selection by exact key (detour of the faction lookup, with addresses)
 - `src/patch_campaign.cpp` — settlement and tree render boxes and video-memory override (engine bytes, with addresses)
 - `src/patch_battle.cpp` — registry of the battle fixes, gated by the `[battle]` keys
 - `src/shaku/` — ShakuEight's hook engine (`hook.*`), guarded memory (`gamemem.*`) and the ten fixes (`fix_*.cpp`), Apache-2.0

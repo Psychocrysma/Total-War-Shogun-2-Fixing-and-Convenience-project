@@ -12,7 +12,15 @@ void ConfigLoad(const std::wstring& ini) {
     g_cfg.allow_unknown_build = ReadBool(L"general", L"allow_unknown_build", g_cfg.allow_unknown_build, ini);
     g_cfg.cursor_clip         = ReadBool(L"patches", L"cursor_clip", g_cfg.cursor_clip, ini);
     g_cfg.borderless          = ReadBool(L"patches", L"borderless", g_cfg.borderless, ini);
+    g_cfg.s2fix_compat        = ReadBool(L"patches", L"s2fix_compat", g_cfg.s2fix_compat, ini);
     g_cfg.agent_chance_clamp  = ReadBool(L"patches", L"agent_chance_clamp", g_cfg.agent_chance_clamp, ini);
+    {   // [voices] fots_voice_units: missing key = the Portugal add-on's list; empty value = off
+        static wchar_t vbuf[8192];
+        GetPrivateProfileStringW(L"voices", L"fots_voice_units", L"Port_Aventuros,Port_Besteiros,Port_Besteiros_Garrison,Port_Besteiros_Garrison_Retainers,Port_Besteiros_do_Conto,Port_Besteiros_do_Conto_Garrison,Port_Espingardeiros,Port_Espingardeiros_Garrison,Port_Halbediers,Port_Halbediers_Garrison,Port_Halbediers_Garrison_Guard,Port_Merchant_Crew,Port_Merchant_Crew_Garrison,Port_Musketeers,Port_Musketeers_Garrison,Port_Musketeers_Garrison_Retainers,Port_Pikemen,Port_Pikemen_Garrison,Port_Rodeleros,Port_Rodeleros_Garrison,Port_Rodeleros_Garrison_Champions,Port_Rodeleros_Garrison_Guard,Port_Swordsmen,Port_Swordsmen_Garrison,Port_Swordsmen_Garrison_Retainers,Port_Caravel,Port_Galleon,Port_Merchant_Caravel", vbuf, 8192, ini.c_str());
+        g_cfg.fots_voice_units = vbuf;
+        g_cfg.fots_voice_debug_log = ReadBool(L"voices", L"fots_voice_debug_log", false, ini);
+    }
+    g_cfg.clan_select_exact   = ReadBool(L"patches", L"clan_select_exact", g_cfg.clan_select_exact, ini);
     wchar_t buf[32] = L"0";
     GetPrivateProfileStringW(L"patches", L"ui_scale", L"auto", buf, 32, ini.c_str());
     for (wchar_t* c = buf; *c; ++c) *c = static_cast<wchar_t>(towlower(*c));
@@ -57,4 +65,8 @@ void ConfigLoad(const std::wstring& ini) {
     g_cfg.alt_group_move      = ReadBool(L"battle", L"alt_group_move", g_cfg.alt_group_move, ini);
     g_cfg.alt_rotate_speed    = GetPrivateProfileIntW(L"battle", L"alt_rotate_speed", g_cfg.alt_rotate_speed, ini.c_str());
     g_cfg.alt_debug_log = ReadBool(L"battle", L"alt_debug_log", false, ini);
+    g_cfg.ai_difficulty_accuracy    = ReadBool(L"battle", L"ai_difficulty_accuracy", g_cfg.ai_difficulty_accuracy, ini);
+    g_cfg.projectile_sound_priority = ReadBool(L"battle", L"projectile_sound_priority", g_cfg.projectile_sound_priority, ini);
+    g_cfg.fear_stacking             = ReadBool(L"battle", L"fear_stacking", g_cfg.fear_stacking, ini);
+    g_cfg.battle_rules_debug_log    = ReadBool(L"battle", L"battle_rules_debug_log", false, ini);
 }

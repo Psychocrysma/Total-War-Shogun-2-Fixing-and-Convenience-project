@@ -57,7 +57,10 @@ void InstallAll(const char* how) {
     PatchUIScale_Install();
     PatchCampaign_Install();
     PatchMoveCell_Install();
+    PatchClanSelect_Install();
+    PatchUnitVoices_Install();
     PatchBattle_Install();
+    PatchBattleRules_Install();
     PatchAltMove_Install();
     PatchAltInput_Install();
     PatchUIDiag_Install();
@@ -128,6 +131,7 @@ BOOL WINAPI DllMain(HINSTANCE inst, DWORD reason, LPVOID) {
         if (o_GetProcAddress) HookImport(GetModuleHandleW(nullptr), "KERNEL32.dll", "GetProcAddress", (void*)o_GetProcAddress);
         PatchAltMove_Remove();
         PatchUIDiag_Remove();
+        PatchUnitVoices_Remove();
         PatchUIScale_Remove();
         PatchBattle_Remove();
         Log("unloading");
